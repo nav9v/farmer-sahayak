@@ -1,0 +1,181 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import { Send, ArrowLeft, Volume2, VolumeX, Loader2, MessageCircle } from "lucide-react";
+import { useStore } from "@/store/useStore";
+import { useChat } from "@/hooks/useChat";
+import MessageBubble from "@/components/Chat/MessageBubble";
+
+export default function ChatPage() {
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const currentLanguage = useStore((state) => state.currentLanguage);
+  const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
+  const [isTTSEnabled, setIsTTSEnabled] = useState(true);
+  const { messages, isLoading, sendMessage } = useChat(isTTSEnabled);
+  const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
+
+  useEffect(() => {
+    if (currentLanguage) {
+      i18n.changeLanguage(currentLanguage);
+    }
+  }, [currentLanguage, i18n]);
+
+  // Auto-scroll when new messages arrive
+  useEffect(() => {
+    if (autoScroll && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, autoScroll]);
+
+  // Detect manual scrolling
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+    setAutoScroll(isAtBottom);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim()) {
+      sendMessage(input);
+      setInput("");
+    }
+  };
+
+  const handleBackClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const newRipple = { x, y, id: Date.now() };
+    setRipples([...ripples, newRipple]);
+    
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
+    }, 600);
+    
+    setIsExiting(true);
+    setTimeout(() => {
+      router.push("/");
+    }, 300);
+  };
+
+  return (
+    <div className={`fixed inset-0 flex flex-col bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 transition-transform duration-300 ${
+      isExiting ? "translate-x-full" : "translate-x-0"
+    }`}>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="px-3 pt-3">
+          <div className="bg-white/60 backdrop-blur-2xl rounded-3xl border border-white/40 px-4 md:px-6 py-3 md:py-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleBackClick}
+                className="relative p-2 hover:bg-green-50 rounded-full transition-colors overflow-hidden"
+                aria-label="Back to home"
+              >
+                {ripples.map((ripple) => (
+                  <span
+                    key={ripple.id}
+                    className="absolute rounded-full bg-green-400/40 animate-ripple pointer-events-none"
+                    style={{
+                      left: ripple.x,
+                      top: ripple.y,
+                      width: '20px',
+                      height: '20px',
+                      transform: 'translate(-50%, -50%)',
+                      animation: 'ripple 0.6s ease-out',
+                    }}
+                  />
+                ))}
+                <ArrowLeft className="w-6 h-6 text-green-700 relative z-10" />
+              </button>
+              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <MessageCircle className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg md:text-xl font-bold text-gray-800">{t('chat')}</h2>
+                <p className="text-xs text-gray-600">{t('askForAdvice')}</p>
+              </div>
+              <button
+                onClick={() => setIsTTSEnabled(!isTTSEnabled)}
+                className={`p-2 md:p-3 rounded-full transition-all shadow-md ${
+                  isTTSEnabled 
+                    ? "bg-green-500 text-white shadow-green-200" 
+                    : "bg-gray-100 text-gray-400"
+                }`}
+                aria-label={isTTSEnabled ? "Disable voice" : "Enable voice"}
+                title={isTTSEnabled ? "Disable voice" : "Enable voice"}
+              >
+                {isTTSEnabled ? (
+                  <Volume2 className="w-5 h-5 md:w-6 md:h-6" />
+                ) : (
+                  <VolumeX className="w-5 h-5 md:w-6 md:h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Messages */}
+        <div 
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className="flex-1 p-4 overflow-y-auto"
+        >
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
+              <MessageCircle className="w-20 h-20 mb-4 text-gray-300" />
+              <p className="text-xl font-semibold mb-2">{t('noMessages')}</p>
+              <p className="text-sm max-w-md">{t('askAbout')}</p>
+            </div>
+          ) : (
+            <div className="space-y-4 max-w-4xl mx-auto">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+              {isLoading && (
+                <div className="flex items-center gap-2 text-gray-500 justify-center">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>{t('preparingAnswer')}</span>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input - Rounded Style */}
+        <div className="px-3 pb-3">
+          <form onSubmit={handleSubmit} className="bg-white/60 backdrop-blur-2xl rounded-3xl border border-white/40 px-4 md:px-6 py-3 md:py-4">
+            <div className="flex gap-3 items-center">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={t('typeQuestion')}
+                disabled={isLoading}
+                className="flex-1 px-4 py-3 text-base text-gray-800 placeholder:text-gray-400 bg-gray-50/80 border-2 border-gray-200/50 rounded-2xl focus:outline-none focus:border-green-400 focus:bg-white disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="p-3 md:px-6 md:py-3 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold shadow-lg flex items-center gap-2"
+              >
+                <Send className="w-5 h-5" />
+                <span className="hidden md:inline">{t('send')}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
