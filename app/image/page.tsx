@@ -112,44 +112,75 @@ export default function ImagePage() {
       if (plantResult.success && plantResult.data) {
         analysisData = plantResult.data;
       } else {
+        // Show specific error from Plant.id if it's an API key or configuration issue
+        if (plantResult.error && (plantResult.error.includes("API key") || plantResult.error.includes("not configured"))) {
+          setError(plantResult.error);
+          return;
+        }
+        
         // Fallback to Crop.health
         const cropResult = await analyzeCropHealth(base64Data);
         
         if (cropResult.success && cropResult.data) {
           analysisData = cropResult.data;
         } else {
-          setError(cropResult.error || "Failed to analyze image");
+          // Show specific error message from the API
+          const errorMsg = cropResult.error || plantResult.error || "Failed to analyze image. Please try again.";
+          setError(errorMsg);
           return;
         }
       }
 
       // Translate results if language is not English
       if (analysisData && currentLanguage && currentLanguage !== "en-IN") {
-        const [
-          translatedPlantName,
-          translatedPlantDesc,
-          translatedDisease,
-          translatedTreatment,
-          translatedSymptoms,
-          translatedPrevention,
-        ] = await Promise.all([
-          analysisData.plantName ? translateText(analysisData.plantName, currentLanguage) : Promise.resolve(""),
-          analysisData.plantDescription ? translateText(analysisData.plantDescription, currentLanguage) : Promise.resolve(""),
-          translateText(analysisData.disease, currentLanguage),
-          analysisData.treatment ? translateText(analysisData.treatment, currentLanguage) : Promise.resolve(""),
-          analysisData.symptoms ? translateText(analysisData.symptoms, currentLanguage) : Promise.resolve(""),
-          analysisData.prevention ? translateText(analysisData.prevention, currentLanguage) : Promise.resolve(""),
-        ]);
+        try {
+          // Use individual promises with fallback to prevent complete failure
+          const translationResults = await Promise.allSettled([
+            analysisData.plantName ? translateText(analysisData.plantName, currentLanguage) : Promise.resolve(""),
+            analysisData.plantDescription ? translateText(analysisData.plantDescription, currentLanguage) : Promise.resolve(""),
+            translateText(analysisData.disease, currentLanguage),
+            analysisData.treatment ? translateText(analysisData.treatment, currentLanguage) : Promise.resolve(""),
+            analysisData.symptoms ? translateText(analysisData.symptoms, currentLanguage) : Promise.resolve(""),
+            analysisData.prevention ? translateText(analysisData.prevention, currentLanguage) : Promise.resolve(""),
+          ]);
 
-        analysisData = {
-          ...analysisData,
-          plantName: translatedPlantName || analysisData.plantName,
-          plantDescription: translatedPlantDesc || analysisData.plantDescription,
-          disease: translatedDisease || analysisData.disease,
-          treatment: translatedTreatment || analysisData.treatment,
-          symptoms: translatedSymptoms || analysisData.symptoms,
-          prevention: translatedPrevention || analysisData.prevention,
-        };
+          // Extract translated values or fallback to original
+          const [
+            translatedPlantName,
+            translatedPlantDesc,
+            translatedDisease,
+            translatedTreatment,
+            translatedSymptoms,
+            translatedPrevention,
+          ] = translationResults.map((result, index) => {
+            if (result.status === "fulfilled" && result.value) {
+              return result.value;
+            }
+            // Fallback to original value if translation failed
+            const originalValues = [
+              analysisData.plantName,
+              analysisData.plantDescription,
+              analysisData.disease,
+              analysisData.treatment,
+              analysisData.symptoms,
+              analysisData.prevention,
+            ];
+            return originalValues[index] || "";
+          });
+
+          analysisData = {
+            ...analysisData,
+            plantName: translatedPlantName || analysisData.plantName,
+            plantDescription: translatedPlantDesc || analysisData.plantDescription,
+            disease: translatedDisease || analysisData.disease,
+            treatment: translatedTreatment || analysisData.treatment,
+            symptoms: translatedSymptoms || analysisData.symptoms,
+            prevention: translatedPrevention || analysisData.prevention,
+          };
+        } catch (translationError) {
+          console.error("Translation error:", translationError);
+          // Continue with original English text if translation fails
+        }
       }
 
       setResult(analysisData);
@@ -175,7 +206,24 @@ export default function ImagePage() {
         setHistory(updatedHistory);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error occurred");
+      console.error("Image analysis error:", err);
+      
+      // Provide user-friendly error messages
+      let errorMessage = "An unexpected error occurred";
+      
+      if (err instanceof Error) {
+        if (err.message.includes("API key")) {
+          errorMessage = err.message;
+        } else if (err.message.includes("Network") || err.message.includes("fetch")) {
+          errorMessage = "Network error: Please check your internet connection and try again.";
+        } else if (err.message.includes("base64") || err.message.includes("image")) {
+          errorMessage = "Invalid image format. Please select a valid image file.";
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

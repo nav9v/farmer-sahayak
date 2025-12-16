@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { Mic, MicOff, Send, ArrowLeft, Volume2, Copy, Check, ChevronDown, ChevronUp, Brain } from "lucide-react";
+import { Mic, MicOff, Send, ArrowLeft, Volume2, Copy, Check, ChevronDown, ChevronUp, Brain, Square } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useStore } from "@/store/useStore";
 import { getLanguageByCode } from "@/lib/languages";
 import { useChat } from "@/hooks/useChat";
+import { useStreamingTTS } from "@/hooks/useStreamingTTS";
 
 export default function VoicePage() {
   const { t, i18n } = useTranslation();
@@ -18,7 +19,9 @@ export default function VoicePage() {
   const language = getLanguageByCode(currentLanguage);
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
   const [localText, setLocalText] = useState("");
+  const [isManuallyEditing, setIsManuallyEditing] = useState(false);
   const { messages, isLoading, sendMessage } = useChat();
+  const { stopStreaming } = useStreamingTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
@@ -34,10 +37,10 @@ export default function VoicePage() {
   }, [currentLanguage, i18n]);
 
   useEffect(() => {
-    if (transcript) {
+    if (transcript && !isManuallyEditing) {
       setLocalText(transcript);
     }
-  }, [transcript]);
+  }, [transcript, isManuallyEditing]);
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -247,6 +250,15 @@ export default function VoicePage() {
                           <audio controls className="flex-1 h-10" preload="auto">
                             <source src={`data:audio/mpeg;base64,${msg.audioBase64}`} type="audio/mpeg" />
                           </audio>
+                          {msg.isStreaming && (
+                            <button
+                              onClick={() => stopStreaming()}
+                              className="ml-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-1"
+                              title="Stop audio"
+                            >
+                              <Square className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       )}
                       <div className={`text-xs mt-2 ${msg.role === "user" ? "text-purple-100" : "text-gray-500"}`}>
@@ -290,9 +302,17 @@ export default function VoicePage() {
         {(listening || localText) && (
           <div className="mx-3 mb-2 bg-purple-50/90 backdrop-blur-sm border border-purple-200 rounded-2xl p-3">
             <p className="text-sm text-purple-600 mb-1">Live Transcription:</p>
-            <p className="text-base text-purple-900">
-              {localText || (listening && "Listening...")}
-            </p>
+            <input
+              type="text"
+              value={localText}
+              onChange={(e) => {
+                setLocalText(e.target.value);
+                setIsManuallyEditing(true);
+              }}
+              onBlur={() => setIsManuallyEditing(false)}
+              placeholder={listening ? "Listening..." : "Type or speak..."}
+              className="w-full text-base text-purple-900 bg-transparent border-none outline-none focus:ring-2 focus:ring-purple-300 rounded px-2 py-1"
+            />
           </div>
         )}
 

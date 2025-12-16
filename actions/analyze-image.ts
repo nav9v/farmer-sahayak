@@ -22,7 +22,10 @@ export async function analyzePlantImage(
   try {
     const apiKey = process.env.PLANT_ID_API_KEY;
     if (!apiKey) {
-      throw new Error("Plant.id API key not configured");
+      return {
+        success: false,
+        error: "Plant.id API key not configured. Please add PLANT_ID_API_KEY to your .env.local file."
+      };
     }
 
     // Ensure the base64 image has the correct format
@@ -68,6 +71,11 @@ export async function analyzePlantImage(
     }
 
     const data = await detailsResponse.json();
+
+    // Validate response structure
+    if (!data.result) {
+      throw new Error("Invalid response from Plant.id API - missing result data");
+    }
 
     // Get plant identification
     const plantSuggestion = data.result?.classification?.suggestions?.[0];
@@ -127,9 +135,29 @@ export async function analyzePlantImage(
     };
   } catch (error) {
     console.error("Plant analysis error:", error);
+    
+    // Provide specific error messages
+    let errorMessage = "Failed to analyze plant";
+    
+    if (error instanceof Error) {
+      if (error.message.includes("API key")) {
+        errorMessage = error.message;
+      } else if (error.message.includes("fetch")) {
+        errorMessage = "Network error: Unable to connect to Plant.id API. Please check your internet connection.";
+      } else if (error.message.includes("401")) {
+        errorMessage = "Invalid API key. Please check your PLANT_ID_API_KEY in .env.local file.";
+      } else if (error.message.includes("429")) {
+        errorMessage = "API rate limit exceeded. Please try again in a few minutes.";
+      } else if (error.message.includes("500") || error.message.includes("502") || error.message.includes("503")) {
+        errorMessage = "Plant.id API is temporarily unavailable. Please try again later.";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to analyze plant",
+      error: errorMessage,
     };
   }
 }
@@ -140,7 +168,10 @@ export async function analyzeCropHealth(
   try {
     const apiKey = process.env.CROP_HEALTH_API_KEY;
     if (!apiKey) {
-      throw new Error("Crop.health API key not configured");
+      return {
+        success: false,
+        error: "Crop.health API key not configured. Please add CROP_HEALTH_API_KEY to your .env.local file."
+      };
     }
 
     const imageData = base64Image.startsWith("data:")
@@ -191,6 +222,11 @@ export async function analyzeCropHealth(
     }
 
     const data = await detailsResponse.json();
+
+    // Validate response structure
+    if (!data.result) {
+      throw new Error("Invalid response from Crop.health API - missing result data");
+    }
 
     // Get crop identification
     const cropSuggestion = data.result?.crop?.suggestions?.[0];
@@ -254,9 +290,29 @@ export async function analyzeCropHealth(
     };
   } catch (error) {
     console.error("Crop analysis error:", error);
+    
+    // Provide specific error messages
+    let errorMessage = "Failed to analyze crop";
+    
+    if (error instanceof Error) {
+      if (error.message.includes("API key")) {
+        errorMessage = error.message;
+      } else if (error.message.includes("fetch")) {
+        errorMessage = "Network error: Unable to connect to Crop.health API. Please check your internet connection.";
+      } else if (error.message.includes("401")) {
+        errorMessage = "Invalid API key. Please check your CROP_HEALTH_API_KEY in .env.local file.";
+      } else if (error.message.includes("429")) {
+        errorMessage = "API rate limit exceeded. Please try again in a few minutes.";
+      } else if (error.message.includes("500") || error.message.includes("502") || error.message.includes("503")) {
+        errorMessage = "Crop.health API is temporarily unavailable. Please try again later.";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to analyze crop",
+      error: errorMessage,
     };
   }
 }
