@@ -18,6 +18,25 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  openGraph: {
+    title: "Farmer Sahayak - AI Agricultural Advisor",
+    description: "Multilingual AI advisory system for farmers in India",
+    images: [
+      {
+        url: "/og.webp",
+        width: 1200,
+        height: 630,
+        alt: "Farmer Sahayak",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Farmer Sahayak - AI Agricultural Advisor",
+    description: "Multilingual AI advisory system for farmers in India",
+    images: ["/og.webp"],
+  },
 };
 
 export const viewport: Viewport = {
