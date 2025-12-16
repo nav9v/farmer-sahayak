@@ -120,6 +120,12 @@ export default function VoicePage() {
       setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
     }, 600);
     
+    // Stop TTS streaming and speech recognition
+    stopStreaming();
+    if (listening) {
+      SpeechRecognition.stopListening();
+    }
+    
     setIsExiting(true);
     setTimeout(() => {
       router.push("/");
@@ -129,9 +135,9 @@ export default function VoicePage() {
   return (
     <div className={`fixed inset-0 flex flex-col bg-gradient-to-br from-purple-50 via-purple-100 to-purple-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="px-3 pt-3">
-          <div className="bg-white/60 backdrop-blur-2xl rounded-3xl border border-white/40 px-4 md:px-6 py-3 md:py-4">
-            <div className="flex items-center gap-3">
+        <header className="px-2 pt-2 sm:px-3 sm:pt-3">
+          <div className="bg-white/60 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/40 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={handleBackClick}
                 className="relative p-2 hover:bg-purple-50 rounded-full transition-colors overflow-hidden"
@@ -151,14 +157,14 @@ export default function VoicePage() {
                     }}
                   />
                 ))}
-                <ArrowLeft className="w-6 h-6 text-purple-700 relative z-10" />
+                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-purple-700 relative z-10" />
               </button>
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Mic className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                <Mic className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg md:text-xl font-bold text-gray-800">{t('speak')}</h2>
-                <p className="text-xs text-gray-600">{t('speakYourQuestion')}</p>
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">{t('speak')}</h2>
+                <p className="text-xs text-gray-600 hidden sm:block">{t('speakYourQuestion')}</p>
               </div>
             </div>
           </div>
@@ -171,22 +177,22 @@ export default function VoicePage() {
           className="flex-1 p-4 overflow-y-auto"
         >
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-              <Mic className="w-20 h-20 mb-4 text-gray-300" />
-              <p className="text-xl font-semibold mb-2">{t('noMessages')}</p>
-              <p className="text-sm max-w-md">{t('pressMic')}</p>
+            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 px-4">
+              <Mic className="w-16 h-16 sm:w-20 sm:h-20 mb-3 sm:mb-4 text-gray-300" />
+              <p className="text-lg sm:text-xl font-semibold mb-2">{t('noMessages')}</p>
+              <p className="text-xs sm:text-sm max-w-md">{t('pressMic')}</p>
             </div>
           ) : (
-            <div className="space-y-4 max-w-4xl mx-auto">
+            <div className="space-y-3 sm:space-y-4 max-w-4xl mx-auto">
               {messages.map((msg) => (
-                <div key={msg.id} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div key={msg.id} className={`flex gap-2 sm:gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   {msg.role === "assistant" && (
-                    <div className="shrink-0 w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                    <div className="shrink-0 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                       AI
                     </div>
                   )}
-                  <div className="flex flex-col gap-1 max-w-[75%]">
-                    <div className={`rounded-3xl px-6 py-4 ${
+                  <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%]">
+                    <div className={`rounded-2xl sm:rounded-3xl px-3 py-2 sm:px-6 sm:py-4 ${
                       msg.role === "user"
                         ? "bg-purple-600 text-white rounded-br-none"
                         : "bg-white border-2 border-gray-200 text-gray-800 rounded-bl-none"
@@ -209,7 +215,7 @@ export default function VoicePage() {
                             )}
                           </button>
                           {expandedThinking.has(msg.id) && (
-                            <div className="px-3 py-2 border-t border-purple-200 bg-white max-h-48 overflow-y-auto">
+                            <div className="px-2 py-1.5 sm:px-3 sm:py-2 border-t border-purple-200 bg-white max-h-40 sm:max-h-48 overflow-y-auto">
                               <p className="text-xs leading-relaxed text-gray-600 whitespace-pre-wrap">
                                 {msg.thinkingText}
                               </p>
@@ -219,7 +225,7 @@ export default function VoicePage() {
                       )}
 
                       {/* Text content with markdown rendering */}
-                      <div className={`text-base leading-relaxed ${msg.role === "user" ? "text-white" : "text-gray-800"}`}>
+                      <div className={`text-sm sm:text-base leading-relaxed ${msg.role === "user" ? "text-white" : "text-gray-800"}`}>
                         <ReactMarkdown 
                           remarkPlugins={[remarkGfm]}
                           components={{
@@ -245,18 +251,18 @@ export default function VoicePage() {
                         </ReactMarkdown>
                       </div>
                       {msg.audioBase64 && msg.role === "assistant" && (
-                        <div className="mt-3 flex items-center gap-2 bg-purple-50 p-3 rounded-xl">
-                          <Volume2 className="w-5 h-5 text-purple-600 shrink-0" />
-                          <audio controls className="flex-1 h-10" preload="auto">
+                        <div className="mt-2 sm:mt-3 flex items-center gap-1.5 sm:gap-2 bg-purple-50 p-2 sm:p-3 rounded-lg sm:rounded-xl">
+                          <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 shrink-0" />
+                          <audio controls className="flex-1 h-8 sm:h-10" preload="auto">
                             <source src={`data:audio/mpeg;base64,${msg.audioBase64}`} type="audio/mpeg" />
                           </audio>
                           {msg.isStreaming && (
                             <button
                               onClick={() => stopStreaming()}
-                              className="ml-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-1"
+                              className="ml-1 sm:ml-2 p-1.5 sm:p-2 bg-red-500 hover:bg-red-600 text-white rounded-md sm:rounded-lg transition-colors flex items-center gap-1"
                               title="Stop audio"
                             >
-                              <Square className="w-4 h-4" />
+                              <Square className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </button>
                           )}
                         </div>
@@ -287,7 +293,7 @@ export default function VoicePage() {
                     )}
                   </div>
                   {msg.role === "user" && (
-                    <div className="shrink-0 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                    <div className="shrink-0 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                       You
                     </div>
                   )}
@@ -300,8 +306,8 @@ export default function VoicePage() {
 
         {/* Live Transcription Bar */}
         {(listening || localText) && (
-          <div className="mx-3 mb-2 bg-purple-50/90 backdrop-blur-sm border border-purple-200 rounded-2xl p-3">
-            <p className="text-sm text-purple-600 mb-1">Live Transcription:</p>
+          <div className="mx-2 mb-2 sm:mx-3 bg-purple-50/90 backdrop-blur-sm border border-purple-200 rounded-xl sm:rounded-2xl p-2 sm:p-3">
+            <p className="text-xs sm:text-sm text-purple-600 mb-1">Live Transcription:</p>
             <input
               type="text"
               value={localText}
@@ -311,19 +317,19 @@ export default function VoicePage() {
               }}
               onBlur={() => setIsManuallyEditing(false)}
               placeholder={listening ? "Listening..." : "Type or speak..."}
-              className="w-full text-base text-purple-900 bg-transparent border-none outline-none focus:ring-2 focus:ring-purple-300 rounded px-2 py-1"
+              className="w-full text-sm sm:text-base text-purple-900 bg-transparent border-none outline-none focus:ring-2 focus:ring-purple-300 rounded px-2 py-1"
             />
           </div>
         )}
 
         {/* Footer Control Buttons */}
-        <div className="px-3 pb-3">
-          <div className="bg-white/60 backdrop-blur-2xl rounded-3xl border border-white/40 px-4 md:px-6 py-3 md:py-4">
-            <div className="flex gap-3">
+        <div className="px-2 pb-2 sm:px-3 sm:pb-3">
+          <div className="bg-white/60 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/40 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={handleMicToggle}
                 disabled={isLoading}
-                className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-lg md:text-xl transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl transition-all ${
                   listening
                     ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
                     : "bg-purple-600 text-white hover:bg-purple-700"
@@ -331,12 +337,12 @@ export default function VoicePage() {
               >
                 {listening ? (
                   <>
-                    <MicOff className="w-6 h-6 md:w-8 md:h-8" />
+                    <MicOff className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
                     <span>{t('stop')}</span>
                   </>
                 ) : (
                   <>
-                    <Mic className="w-6 h-6 md:w-8 md:h-8" />
+                    <Mic className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
                     <span>{t('start')}</span>
                   </>
                 )}
@@ -346,10 +352,10 @@ export default function VoicePage() {
                 <button
                   onClick={handleSend}
                   disabled={isLoading}
-                  className="px-6 md:px-8 py-4 md:py-5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-2xl transition-all disabled:opacity-50 shadow-lg flex items-center gap-2"
+                  className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl sm:rounded-2xl transition-all disabled:opacity-50 shadow-lg flex items-center gap-1.5 sm:gap-2"
                 >
-                  <Send className="w-6 h-6 md:w-8 md:h-8" />
-                  <span className="text-lg md:text-xl font-bold hidden md:inline">Send</span>
+                  <Send className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
+                  <span className="text-base sm:text-lg md:text-xl font-bold hidden sm:inline">Send</span>
                 </button>
               )}
             </div>

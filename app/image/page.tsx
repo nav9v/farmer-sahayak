@@ -108,7 +108,7 @@ export default function ImagePage() {
       // Try Plant.id first
       const plantResult = await analyzePlantImage(base64Data);
       
-      let analysisData = null;
+      let analysisData: AnalysisResult | null = null;
       if (plantResult.success && plantResult.data) {
         analysisData = plantResult.data;
       } else {
@@ -157,15 +157,18 @@ export default function ImagePage() {
               return result.value;
             }
             // Fallback to original value if translation failed
-            const originalValues = [
-              analysisData.plantName,
-              analysisData.plantDescription,
-              analysisData.disease,
-              analysisData.treatment,
-              analysisData.symptoms,
-              analysisData.prevention,
-            ];
-            return originalValues[index] || "";
+            if (analysisData) {
+              const originalValues = [
+                analysisData.plantName,
+                analysisData.plantDescription,
+                analysisData.disease,
+                analysisData.treatment,
+                analysisData.symptoms,
+                analysisData.prevention,
+              ];
+              return originalValues[index] || "";
+            }
+            return "";
           });
 
           analysisData = {
@@ -281,9 +284,9 @@ export default function ImagePage() {
   return (
     <div className={`fixed inset-0 flex flex-col bg-gradient-to-br from-orange-50 via-red-50 to-orange-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="px-3 pt-3">
-          <div className="bg-white/60 backdrop-blur-2xl rounded-3xl border border-white/40 px-4 md:px-6 py-3 md:py-4">
-            <div className="flex items-center gap-3">
+        <header className="px-2 pt-2 sm:px-3 sm:pt-3">
+          <div className="bg-white/60 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/40 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={handleBackClick}
                 className="relative p-2 hover:bg-orange-50 rounded-full transition-colors overflow-hidden"
@@ -303,22 +306,22 @@ export default function ImagePage() {
                     }}
                   />
                 ))}
-                <ArrowLeft className="w-6 h-6 text-orange-700 relative z-10" />
+                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-orange-700 relative z-10" />
               </button>
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Camera className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-orange-400 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                <Camera className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg md:text-xl font-bold text-gray-800">{t('uploadPhoto')}</h2>
-                <p className="text-xs text-gray-600">{t('takePhoto')}</p>
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">{t('uploadPhoto')}</h2>
+                <p className="text-xs text-gray-600 hidden sm:block">{t('takePhoto')}</p>
               </div>
               {history.length > 0 && (
                 <button
                   onClick={() => setShowHistory(!showHistory)}
-                  className="p-2 hover:bg-orange-50 rounded-full transition-colors"
+                  className="p-1.5 sm:p-2 hover:bg-orange-50 rounded-full transition-colors"
                   aria-label="Toggle history"
                 >
-                  <History className="w-6 h-6 text-orange-700" />
+                  <History className="w-5 h-5 sm:w-6 sm:h-6 text-orange-700" />
                 </button>
               )}
             </div>
@@ -326,20 +329,20 @@ export default function ImagePage() {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex-1 p-3 sm:p-4 overflow-y-auto">
           <div className="max-w-4xl mx-auto">
             {/* History Section */}
             {showHistory && history.length > 0 && (
-              <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-2xl p-4">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-orange-600" />
+              <div className="mb-4 sm:mb-6 bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
                   {t('searchHistory')}
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                   {history.map((item) => (
                     <div
                       key={item.id}
-                      className="relative group overflow-hidden rounded-xl border-2 border-gray-200 hover:border-orange-400 transition-all"
+                      className="relative group overflow-hidden rounded-lg sm:rounded-xl border-2 border-gray-200 hover:border-orange-400 transition-all"
                     >
                       <button
                         onClick={() => handleLoadHistoryItem(item)}
@@ -350,10 +353,10 @@ export default function ImagePage() {
                           alt={item.plantName || item.disease}
                           width={200}
                           height={150}
-                          className="w-full h-32 object-cover"
+                          className="w-full h-24 sm:h-32 object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-2">
-                          <p className="text-white text-xs font-semibold truncate">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-1.5 sm:p-2">
+                          <p className="text-white text-xs font-semibold truncate leading-tight">
                             {item.plantName || item.disease}
                           </p>
                           <p className={`text-xs ${item.isHealthy ? 'text-green-300' : 'text-orange-300'}`}>
@@ -363,10 +366,10 @@ export default function ImagePage() {
                       </button>
                       <button
                         onClick={(e) => handleDeleteHistoryItem(item.id, e)}
-                        className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 shadow-lg"
+                        className="absolute top-1 right-1 sm:top-2 sm:right-2 p-1.5 sm:p-2 bg-red-500 hover:bg-red-600 text-white rounded-full md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 shadow-lg"
                         aria-label="Delete"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </button>
                     </div>
                   ))}
@@ -375,7 +378,7 @@ export default function ImagePage() {
             )}
             {/* Image Preview */}
             {preview && !result && !error && (
-              <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 mb-6">
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6">
                 <Image
                   src={preview}
                   alt="Preview"
@@ -385,9 +388,9 @@ export default function ImagePage() {
                 />
                 <button
                   onClick={handleClear}
-                  className="absolute top-6 right-6 p-3 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-xl"
+                  className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 sm:p-3 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-xl"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
             )}
@@ -396,11 +399,11 @@ export default function ImagePage() {
             {!preview && !result && !error && (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-white/40 backdrop-blur-sm rounded-2xl p-12 cursor-pointer hover:bg-white/60 transition-all border-2 border-dashed border-orange-300 flex flex-col items-center justify-center min-h-[300px]"
+                className="bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl p-8 sm:p-12 cursor-pointer hover:bg-white/60 transition-all border-2 border-dashed border-orange-300 flex flex-col items-center justify-center min-h-[250px] sm:min-h-[300px]"
               >
-                <Camera className="w-20 h-20 mb-4 text-orange-600" />
-                <p className="text-xl font-medium text-orange-900">{t('choosePhoto')}</p>
-                <p className="text-sm text-gray-600 mt-2 text-center">{t('uploadPlantImage')}</p>
+                <Camera className="w-16 h-16 sm:w-20 sm:h-20 mb-3 sm:mb-4 text-orange-600" />
+                <p className="text-lg sm:text-xl font-medium text-orange-900">{t('choosePhoto')}</p>
+                <p className="text-xs sm:text-sm text-gray-600 mt-2 text-center">{t('uploadPlantImage')}</p>
               </div>
             )}
 
@@ -415,24 +418,24 @@ export default function ImagePage() {
 
             {/* Loading State */}
             {isLoading && (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 flex flex-col items-center justify-center">
-                <Loader2 className="w-16 h-16 text-orange-600 animate-spin mb-4" />
-                <p className="text-lg font-medium text-gray-800">{t('analyzing')}</p>
-                <p className="text-sm text-gray-600">Using Kindwise AI</p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center">
+                <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-orange-600 animate-spin mb-3 sm:mb-4" />
+                <p className="text-base sm:text-lg font-medium text-gray-800">{t('analyzing')}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Using Kindwise AI</p>
               </div>
             )}
 
             {/* Error State */}
             {error && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-6 h-6 text-red-600 shrink-0 mt-1" />
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0 mt-0.5 sm:mt-1" />
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-red-900 mb-2">Analysis Failed</h3>
-                    <p className="text-red-700">{error}</p>
+                    <h3 className="text-base sm:text-lg font-bold text-red-900 mb-2">Analysis Failed</h3>
+                    <p className="text-sm sm:text-base text-red-700">{error}</p>
                     <button
                       onClick={handleReset}
-                      className="mt-4 px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+                      className="mt-3 sm:mt-4 px-4 py-2 sm:px-6 text-sm sm:text-base bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-colors"
                     >
                       Try Again
                     </button>
@@ -443,9 +446,9 @@ export default function ImagePage() {
 
             {/* Results */}
             {result && preview && (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Image */}
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4">
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4">
                   <Image
                     src={preview}
                     alt="Analyzed plant"
@@ -457,13 +460,13 @@ export default function ImagePage() {
 
                 {/* Plant Identification */}
                 {result.plantName && (
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6">
-                    <div className="flex items-start gap-3">
-                      <Leaf className="w-8 h-8 text-green-600 shrink-0" />
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-green-600 shrink-0" />
                       <div className="flex-1">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
-                            <h3 className="text-xl font-bold text-green-900 mb-1">
+                            <h3 className="text-lg sm:text-xl font-bold text-green-900 mb-1">
                               {result.plantName}
                             </h3>
                             <p className="text-sm text-green-700 mb-3">
@@ -472,10 +475,10 @@ export default function ImagePage() {
                           </div>
                           <button
                             onClick={() => speakNative(`${result.plantName}. ${result.plantDescription || ''}`, currentLanguage || 'en-IN')}
-                            className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors shrink-0"
+                            className="p-1.5 sm:p-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors shrink-0"
                             aria-label="Speak plant info"
                           >
-                            <Volume2 className="w-5 h-5" />
+                            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
                           </button>
                         </div>
                         {result.plantDescription && (
@@ -489,21 +492,21 @@ export default function ImagePage() {
                 )}
 
                 {/* Health Status */}
-                <div className={`rounded-2xl p-6 ${
+                <div className={`rounded-xl sm:rounded-2xl p-4 sm:p-6 ${
                   result.isHealthy 
                     ? 'bg-green-50 border-2 border-green-200' 
                     : 'bg-orange-50 border-2 border-orange-200'
                 }`}>
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-2 sm:gap-3">
                     {result.isHealthy ? (
-                      <CheckCircle className="w-8 h-8 text-green-600 shrink-0" />
+                      <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-600 shrink-0" />
                     ) : (
-                      <AlertCircle className="w-8 h-8 text-orange-600 shrink-0" />
+                      <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 shrink-0" />
                     )}
                     <div className="flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
-                          <h3 className={`text-xl font-bold mb-1 ${
+                          <h3 className={`text-lg sm:text-xl font-bold mb-1 ${
                             result.isHealthy ? 'text-green-900' : 'text-orange-900'
                           }`}>
                             {result.disease}
@@ -516,7 +519,7 @@ export default function ImagePage() {
                         </div>
                         <button
                           onClick={() => speakNative(result.disease, currentLanguage || 'en-IN')}
-                          className={`p-2 ${
+                          className={`p-1.5 sm:p-2 ${
                             result.isHealthy ? 'bg-green-600 hover:bg-green-700' : 'bg-orange-600 hover:bg-orange-700'
                           } text-white rounded-full transition-colors shrink-0`}
                           aria-label="Speak health status"
@@ -530,65 +533,65 @@ export default function ImagePage() {
 
                 {/* Details */}
                 {!result.isHealthy && (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {result.symptoms && (
-                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
-                        <div className="flex items-start gap-3">
-                          <Info className="w-6 h-6 text-blue-600 shrink-0 mt-1" />
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <Info className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0 mt-0.5 sm:mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-gray-900">{t('symptoms') || 'Symptoms'}</h4>
                               <button
                                 onClick={() => speakNative(result.symptoms || '', currentLanguage || 'en-IN')}
-                                className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors"
+                                className="p-1.5 sm:p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors"
                                 aria-label="Speak symptoms"
                               >
-                                <Volume2 className="w-4 h-4" />
+                                <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               </button>
                             </div>
-                            <p className="text-gray-700 leading-relaxed">{result.symptoms}</p>
+                            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{result.symptoms}</p>
                           </div>
                         </div>
                       </div>
                     )}
 
                     {result.treatment && (
-                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
-                        <div className="flex items-start gap-3">
-                          <Info className="w-6 h-6 text-purple-600 shrink-0 mt-1" />
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <Info className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 shrink-0 mt-0.5 sm:mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-gray-900">{t('treatment') || 'Treatment'}</h4>
                               <button
                                 onClick={() => speakNative(result.treatment || '', currentLanguage || 'en-IN')}
-                                className="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors"
+                                className="p-1.5 sm:p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors"
                                 aria-label="Speak treatment"
                               >
-                                <Volume2 className="w-4 h-4" />
+                                <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               </button>
                             </div>
-                            <p className="text-gray-700 leading-relaxed">{result.treatment}</p>
+                            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{result.treatment}</p>
                           </div>
                         </div>
                       </div>
                     )}
 
                     {result.prevention && (
-                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
-                        <div className="flex items-start gap-3">
-                          <Info className="w-6 h-6 text-teal-600 shrink-0 mt-1" />
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <Info className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600 shrink-0 mt-0.5 sm:mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-gray-900">{t('prevention') || 'Prevention'}</h4>
                               <button
                                 onClick={() => speakNative(result.prevention || '', currentLanguage || 'en-IN')}
-                                className="p-2 bg-teal-600 hover:bg-teal-700 text-white rounded-full transition-colors"
+                                className="p-1.5 sm:p-2 bg-teal-600 hover:bg-teal-700 text-white rounded-full transition-colors"
                                 aria-label="Speak prevention"
                               >
-                                <Volume2 className="w-4 h-4" />
+                                <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               </button>
                             </div>
-                            <p className="text-gray-700 leading-relaxed">{result.prevention}</p>
+                            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{result.prevention}</p>
                           </div>
                         </div>
                       </div>
@@ -599,7 +602,7 @@ export default function ImagePage() {
                 {/* Analyze Another Button */}
                 <button
                   onClick={handleReset}
-                  className="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-2xl font-bold text-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg"
+                  className="w-full py-3 sm:py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg"
                 >
                   Analyze Another Image
                 </button>
@@ -610,16 +613,16 @@ export default function ImagePage() {
 
         {/* Footer Controls */}
         {!result && (
-          <div className="px-3 pb-3">
-            <div className="bg-white/60 backdrop-blur-2xl rounded-3xl border border-white/40 px-4 md:px-6 py-3 md:py-4">
-              <div className="flex gap-3">
+          <div className="px-2 pb-2 sm:px-3 sm:pb-3">
+            <div className="bg-white/60 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/40 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
+              <div className="flex gap-2 sm:gap-3">
                 {!preview ? (
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="flex-1 flex items-center justify-center gap-3 py-4 md:py-5 bg-orange-600 text-white rounded-2xl font-bold text-lg md:text-xl hover:bg-orange-700 disabled:opacity-50 shadow-lg transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 md:py-5 bg-orange-600 text-white rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl hover:bg-orange-700 disabled:opacity-50 shadow-lg transition-all"
                   >
-                    <Camera className="w-6 h-6 md:w-8 md:h-8" />
+                    <Camera className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
                     <span>{t('photo')}</span>
                   </button>
                 ) : (
@@ -627,23 +630,23 @@ export default function ImagePage() {
                     <button
                       onClick={handleClear}
                       disabled={isLoading}
-                      className="px-6 md:px-8 py-4 md:py-5 bg-red-500 hover:bg-red-600 text-white rounded-2xl transition-all disabled:opacity-50 shadow-lg"
+                      className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 bg-red-500 hover:bg-red-600 text-white rounded-xl sm:rounded-2xl transition-all disabled:opacity-50 shadow-lg"
                     >
-                      <X className="w-6 h-6 md:w-8 md:h-8" />
+                      <X className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
                     </button>
                     <button
                       onClick={handleSubmit}
                       disabled={isLoading}
-                      className="flex-1 flex items-center justify-center gap-3 py-4 md:py-5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-2xl transition-all disabled:opacity-50 shadow-lg font-bold text-lg"
+                      className="flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 md:py-5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl sm:rounded-2xl transition-all disabled:opacity-50 shadow-lg font-bold text-base sm:text-lg"
                     >
                       {isLoading ? (
                         <>
-                          <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin" />
+                          <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 animate-spin" />
                           <span>Analyzing...</span>
                         </>
                       ) : (
                         <>
-                          <Camera className="w-6 h-6 md:w-8 md:h-8" />
+                          <Camera className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
                           <span>{t('analyzePlant')}</span>
                         </>
                       )}

@@ -38,19 +38,19 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
   return (
     <div
-      className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"} mb-4`}
+      className={`flex gap-2 sm:gap-3 ${isUser ? "justify-end" : "justify-start"} mb-3 sm:mb-4`}
     >
       {/* Avatar */}
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-600 flex items-center justify-center">
-          <Bot className="w-5 h-5 text-white" />
+        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-600 flex items-center justify-center">
+          <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
       )}
 
       {/* Message Content */}
-      <div className="flex flex-col gap-1 max-w-[75%]">
+      <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%]">
         <div
-          className={`rounded-2xl px-4 py-3 ${
+          className={`rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
             isUser
               ? "bg-green-600 text-white rounded-br-none"
               : "bg-gray-100 text-gray-800 rounded-bl-none"
@@ -71,14 +71,14 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
           {/* Thinking process (collapsible) - only for assistant */}
           {!isUser && message.thinkingText && (
-            <div className="mb-3 border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+            <div className="mb-2 sm:mb-3 border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
               <button
                 onClick={() => setShowThinking(!showThinking)}
-                className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-100 transition-colors"
+                className="w-full flex items-center justify-between px-2 py-1.5 sm:px-3 sm:py-2 hover:bg-gray-100 transition-colors"
               >
-                <div className="flex items-center gap-2">
-                  <Brain className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-medium text-gray-700">AI Thinking Process</span>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+                  <span className="text-xs font-medium text-gray-700">AI Thinking</span>
                 </div>
                 {showThinking ? (
                   <ChevronUp className="w-4 h-4 text-gray-500" />
@@ -87,7 +87,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                 )}
               </button>
               {showThinking && (
-                <div className="px-3 py-2 border-t border-gray-300 bg-white max-h-48 overflow-y-auto">
+                <div className="px-2 py-1.5 sm:px-3 sm:py-2 border-t border-gray-300 bg-white max-h-40 sm:max-h-48 overflow-y-auto">
                   <p className="text-xs leading-relaxed text-gray-600 whitespace-pre-wrap">
                     {message.thinkingText}
                   </p>
@@ -97,7 +97,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           )}
 
           {/* Text content with markdown rendering */}
-          <div className={`text-sm leading-relaxed ${isUser ? "text-white" : "text-gray-800"}`}>
+          <div className={`text-xs sm:text-sm leading-relaxed ${isUser ? "text-white" : "text-gray-800"}`}>
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={{
@@ -125,19 +125,19 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
           {/* Streaming indicator */}
           {!isUser && message.isStreaming && (
-            <div className="mt-2 flex items-center gap-2 text-green-600">
-              <Volume2 className="w-4 h-4 animate-pulse" />
+            <div className="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2 text-green-600">
+              <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse" />
               <span className="text-xs">Playing audio...</span>
             </div>
           )}
 
           {/* Audio player for AI responses (fallback for non-streaming) */}
           {!isUser && message.audioBase64 && !message.isStreaming && (
-            <div className="mt-2">
+            <div className="mt-1.5 sm:mt-2">
               <audio
                 ref={audioRef}
                 controls
-                className="w-full h-8"
+                className="w-full h-7 sm:h-8"
                 preload="auto"
               >
                 <source
@@ -186,8 +186,8 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
       {/* User Avatar */}
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
-          <User className="w-5 h-5 text-white" />
+        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-600 flex items-center justify-center">
+          <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
       )}
     </div>
