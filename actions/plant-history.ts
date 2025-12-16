@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { plantAnalysisHistory } from "@/drizzle/schema";
 import { desc, eq } from "drizzle-orm";
+import { deleteImageFromBlob } from "@/lib/blob-storage";
 
 interface PlantHistoryItem {
   id: string;
@@ -96,6 +97,23 @@ export async function deletePlantAnalysisHistory(
   sessionId: string
 ): Promise<{ success: boolean }> {
   try {
+    // Get all items to delete their blob images
+    const items = await db
+      .select()
+      .from(plantAnalysisHistory)
+      .where(eq(plantAnalysisHistory.sessionId, sessionId));
+    
+    // Delete blob images (only if they're blob URLs, not base64)
+    await Promise.all(
+      items.map((item) => {
+        if (item.imageUrl.startsWith("https://") && item.imageUrl.includes("blob.vercel-storage.com")) {
+          return deleteImageFromBlob(item.imageUrl);
+        }
+        return Promise.resolve({ success: true });
+      })
+    );
+    
+    // Delete from database
     await db
       .delete(plantAnalysisHistory)
       .where(eq(plantAnalysisHistory.sessionId, sessionId));
@@ -110,6 +128,18 @@ export async function deleteSinglePlantAnalysis(
   id: string
 ): Promise<{ success: boolean }> {
   try {
+    // Get the item to delete its blob image
+    const [item] = await db
+      .select()
+      .from(plantAnalysisHistory)
+      .where(eq(plantAnalysisHistory.id, id))
+      .limit(1);
+    
+    if (item && item.imageUrl.startsWith("https://") && item.imageUrl.includes("blob.vercel-storage.com")) {
+      await deleteImageFromBlob(item.imageUrl);
+    }
+    
+    // Delete from database
     await db
       .delete(plantAnalysisHistory)
       .where(eq(plantAnalysisHistory.id, id));

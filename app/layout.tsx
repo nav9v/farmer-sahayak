@@ -12,6 +12,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://farmer-sahayak.vercel.app'),
   title: "Farmer Sahayak - AI Agricultural Advisor",
   description: "Multilingual AI advisory system for farmers in India",
   manifest: "/manifest.json",

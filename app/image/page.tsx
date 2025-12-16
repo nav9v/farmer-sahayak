@@ -10,6 +10,8 @@ import { translateText } from "@/actions/translate-text";
 import { savePlantAnalysis, getPlantAnalysisHistory, deleteSinglePlantAnalysis } from "@/actions/plant-history";
 import { speakNative } from "@/lib/audio";
 import Image from "next/image";
+import { compressImage, validateImageFile, extractBase64 } from "@/lib/image-compression";
+import { uploadImageToBlob } from "@/lib/blob-storage";
 
 interface AnalysisResult {
   plantName?: string;
@@ -71,22 +73,31 @@ export default function ImagePage() {
     loadHistory();
   }, [sessionId]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert(t('fileTooLarge'));
+    // Validate file
+    const validation = validateImageFile(file, 10);
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid file');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      setPreview(result);
-      setBase64Data(result.split(",")[1]);
-    };
-    reader.readAsDataURL(file);
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Compress image for mobile compatibility (max 800KB, 1920px)
+      const compressedDataUrl = await compressImage(file, 0.8, 1920);
+      setPreview(compressedDataUrl);
+      setBase64Data(extractBase64(compressedDataUrl));
+    } catch (err) {
+      console.error('Image compression error:', err);
+      setError('Failed to process image. Please try another image.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClear = () => {
@@ -188,11 +199,15 @@ export default function ImagePage() {
 
       setResult(analysisData);
 
-      // Save to history with the image preview
-      if (analysisData && preview && sessionId) {
+      // Upload image to Blob storage and save to history
+      if (analysisData && preview && sessionId && base64Data) {
+        // Upload to Vercel Blob
+        const uploadResult = await uploadImageToBlob(base64Data, `plant-${sessionId}-${Date.now()}.jpg`);
+        const imageUrl = uploadResult.success && uploadResult.url ? uploadResult.url : preview;
+        
         await savePlantAnalysis({
           sessionId,
-          imageUrl: preview,
+          imageUrl: imageUrl, // Use Blob URL if upload succeeded, fallback to base64
           plantName: analysisData.plantName,
           plantDescription: analysisData.plantDescription,
           plantProbability: analysisData.plantProbability,
@@ -376,16 +391,29 @@ export default function ImagePage() {
                 </div>
               </div>
             )}
+            
             {/* Image Preview */}
             {preview && !result && !error && (
               <div className="relative bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6">
-                <Image
-                  src={preview}
-                  alt="Preview"
-                  width={600}
-                  height={400}
-                  className="w-full h-auto rounded-xl"
-                />
+                {preview.startsWith('data:') ? (
+                  // Use native img for base64 data URLs
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                  />
+                ) : (
+                  // Use Next.js Image for Blob URLs (optimized)
+                  <Image
+                    src={preview}
+                    alt="Preview"
+                    width={800}
+                    height={600}
+                    className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                    unoptimized={preview.startsWith('blob:')}
+                  />
+                )}
                 <button
                   onClick={handleClear}
                   className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 sm:p-3 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-xl"
@@ -449,15 +477,26 @@ export default function ImagePage() {
               <div className="space-y-3 sm:space-y-4">
                 {/* Image */}
                 <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4">
-                  <Image
-                    src={preview}
-                    alt="Analyzed plant"
-                    width={600}
-                    height={400}
-                    className="w-full h-auto rounded-xl"
-                  />
+                  {preview.startsWith('data:') ? (
+                    // Use native img for base64 data URLs
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={preview}
+                      alt="Analyzed plant"
+                      className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                    />
+                  ) : (
+                    // Use Next.js Image for Blob URLs (optimized)
+                    <Image
+                      src={preview}
+                      alt="Analyzed plant"
+                      width={800}
+                      height={600}
+                      className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                      unoptimized={preview.startsWith('blob:')}
+                    />
+                  )}
                 </div>
-
                 {/* Plant Identification */}
                 {result.plantName && (
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
