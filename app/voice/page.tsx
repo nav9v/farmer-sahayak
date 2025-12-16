@@ -133,7 +133,7 @@ export default function VoicePage() {
   };
 
   return (
-    <div className={`fixed inset-0 flex flex-col bg-gradient-to-br from-purple-50 via-purple-100 to-purple-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
+    <div className={`fixed inset-0 flex flex-col bg-linear-to-br from-purple-50 via-purple-100 to-purple-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="px-2 pt-2 sm:px-3 sm:pt-3">
           <div className="bg-white/60 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/40 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
@@ -159,7 +159,7 @@ export default function VoicePage() {
                 ))}
                 <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-purple-700 relative z-10" />
               </button>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-purple-400 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
                 <Mic className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="flex-1">
@@ -352,7 +352,7 @@ export default function VoicePage() {
                 <button
                   onClick={handleSend}
                   disabled={isLoading}
-                  className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl sm:rounded-2xl transition-all disabled:opacity-50 shadow-lg flex items-center gap-1.5 sm:gap-2"
+                  className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 bg-linear-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl sm:rounded-2xl transition-all disabled:opacity-50 shadow-lg flex items-center gap-1.5 sm:gap-2"
                 >
                   <Send className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
                   <span className="text-base sm:text-lg md:text-xl font-bold hidden sm:inline">Send</span>

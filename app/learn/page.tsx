@@ -103,7 +103,7 @@ export default function LearnPage() {
   };
 
   return (
-    <div className={`fixed inset-0 flex flex-col bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
+    <div className={`fixed inset-0 flex flex-col bg-linear-to-br from-amber-50 via-yellow-50 to-orange-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
       <FarmingBackground />
       <div className="flex-1 flex flex-col overflow-hidden relative z-10">
         <header className="px-2 pt-2 sm:px-3 sm:pt-3">
@@ -130,7 +130,7 @@ export default function LearnPage() {
                 ))}
                 <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700 relative z-10" />
               </button>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
                 <BookOpen className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="flex-1">
@@ -151,7 +151,7 @@ export default function LearnPage() {
                   key={index}
                   className={`group relative rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 ease-out ${
                     isActive 
-                      ? 'bg-gradient-to-br from-orange-500 to-amber-500 shadow-xl shadow-orange-200' 
+                      ? 'bg-linear-to-br from-orange-500 to-amber-500 shadow-xl shadow-orange-200' 
                       : 'bg-white/80 hover:bg-white shadow-sm hover:shadow-md'
                   }`}
                 >

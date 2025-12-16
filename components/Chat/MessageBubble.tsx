@@ -38,19 +38,19 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
   return (
     <div
-      className={`flex gap-2 sm:gap-3 ${isUser ? "justify-end" : "justify-start"} mb-3 sm:mb-4`}
+      className={`flex gap-2 sm:gap-3 ${isUser ? "justify-end" : "justify-start"} mb-3 sm:mb-4 min-w-0`}
     >
       {/* Avatar */}
       {!isUser && (
-        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-600 flex items-center justify-center">
+        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-600 flex items-center justify-center shadow-sm">
           <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
       )}
 
       {/* Message Content */}
-      <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%]">
+      <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%] min-w-0">
         <div
-          className={`rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
+          className={`rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-sm ${
             isUser
               ? "bg-green-600 text-white rounded-br-none"
               : "bg-gray-100 text-gray-800 rounded-bl-none"
@@ -71,7 +71,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
           {/* Thinking process (collapsible) - only for assistant */}
           {!isUser && message.thinkingText && (
-            <div className="mb-2 sm:mb-3 border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+            <div className="mb-2 sm:mb-3 border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner">
               <button
                 onClick={() => setShowThinking(!showThinking)}
                 className="w-full flex items-center justify-between px-2 py-1.5 sm:px-3 sm:py-2 hover:bg-gray-100 transition-colors"
@@ -97,7 +97,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           )}
 
           {/* Text content with markdown rendering */}
-          <div className={`text-xs sm:text-sm leading-relaxed ${isUser ? "text-white" : "text-gray-800"}`}>
+          <div className={`text-xs sm:text-sm leading-relaxed wrap-break-word ${isUser ? "text-white" : "text-gray-800"}`}>
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={{
@@ -114,8 +114,8 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                 li: ({node, ...props}) => <li className="my-1" {...props} />,
                 code: ({node, inline, ...props}: any) => 
                   inline 
-                    ? <code className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-xs" {...props} />
-                    : <code className="block bg-gray-800 text-white p-3 rounded my-2 overflow-x-auto" {...props} />,
+                    ? <code className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-xs break-all" {...props} />
+                    : <code className="block bg-gray-800 text-white p-2 sm:p-3 rounded my-2 overflow-x-auto text-xs" {...props} />,
                 blockquote: ({node, ...props}) => <blockquote className={`border-l-4 pl-4 my-2 italic ${isUser ? "border-green-300" : "border-gray-300"}`} {...props} />,
               }}
             >
@@ -137,7 +137,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
               <audio
                 ref={audioRef}
                 controls
-                className="w-full h-7 sm:h-8"
+                className="w-full h-8 sm:h-9 rounded"
                 preload="auto"
               >
                 <source
@@ -186,7 +186,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
       {/* User Avatar */}
       {isUser && (
-        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-600 flex items-center justify-center">
+        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-600 flex items-center justify-center shadow-sm">
           <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
       )}

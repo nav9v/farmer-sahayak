@@ -297,7 +297,7 @@ export default function ImagePage() {
   };
 
   return (
-    <div className={`fixed inset-0 flex flex-col bg-gradient-to-br from-orange-50 via-red-50 to-orange-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
+    <div className={`fixed inset-0 flex flex-col bg-linear-to-br from-orange-50 via-red-50 to-orange-50 transition-transform duration-300 ${isExiting ? 'translate-x-full' : 'translate-x-0'}`}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="px-2 pt-2 sm:px-3 sm:pt-3">
           <div className="bg-white/60 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/40 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
@@ -323,7 +323,7 @@ export default function ImagePage() {
                 ))}
                 <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-orange-700 relative z-10" />
               </button>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-orange-400 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-orange-400 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
                 <Camera className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="flex-1">
@@ -370,7 +370,7 @@ export default function ImagePage() {
                           height={150}
                           className="w-full h-24 sm:h-32 object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-1.5 sm:p-2">
+                        <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent flex flex-col justify-end p-1.5 sm:p-2">
                           <p className="text-white text-xs font-semibold truncate leading-tight">
                             {item.plantName || item.disease}
                           </p>
@@ -401,7 +401,7 @@ export default function ImagePage() {
                   <img
                     src={preview}
                     alt="Preview"
-                    className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                    className="w-full h-auto rounded-xl max-h-100 object-contain"
                   />
                 ) : (
                   // Use Next.js Image for Blob URLs (optimized)
@@ -410,7 +410,7 @@ export default function ImagePage() {
                     alt="Preview"
                     width={800}
                     height={600}
-                    className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                    className="w-full h-auto rounded-xl max-h-100 object-contain"
                     unoptimized={preview.startsWith('blob:')}
                   />
                 )}
@@ -426,9 +426,9 @@ export default function ImagePage() {
             {/* Upload Area */}
             {!preview && !result && !error && (
               <div
-                onClick={() => fileInputRef.current?.click()}
-                className="bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl p-8 sm:p-12 cursor-pointer hover:bg-white/60 transition-all border-2 border-dashed border-orange-300 flex flex-col items-center justify-center min-h-[250px] sm:min-h-[300px]"
-              >
+                  onClick={() => fileInputRef.current?.click()}
+                  className="bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl p-8 sm:p-12 cursor-pointer hover:bg-white/60 transition-all border-2 border-dashed border-orange-300 flex flex-col items-center justify-center min-h-64 sm:min-h-72"
+                >
                 <Camera className="w-16 h-16 sm:w-20 sm:h-20 mb-3 sm:mb-4 text-orange-600" />
                 <p className="text-lg sm:text-xl font-medium text-orange-900">{t('choosePhoto')}</p>
                 <p className="text-xs sm:text-sm text-gray-600 mt-2 text-center">{t('uploadPlantImage')}</p>
@@ -483,7 +483,7 @@ export default function ImagePage() {
                     <img
                       src={preview}
                       alt="Analyzed plant"
-                      className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                      className="w-full h-auto rounded-xl max-h-100 object-contain"
                     />
                   ) : (
                     // Use Next.js Image for Blob URLs (optimized)
@@ -492,14 +492,14 @@ export default function ImagePage() {
                       alt="Analyzed plant"
                       width={800}
                       height={600}
-                      className="w-full h-auto rounded-xl max-h-[400px] object-contain"
+                      className="w-full h-auto rounded-xl max-h-100 object-contain"
                       unoptimized={preview.startsWith('blob:')}
                     />
                   )}
                 </div>
                 {/* Plant Identification */}
                 {result.plantName && (
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                  <div className="bg-linear-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                     <div className="flex items-start gap-2 sm:gap-3">
                       <Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-green-600 shrink-0" />
                       <div className="flex-1">
@@ -641,7 +641,7 @@ export default function ImagePage() {
                 {/* Analyze Another Button */}
                 <button
                   onClick={handleReset}
-                  className="w-full py-3 sm:py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg"
+                  className="w-full py-3 sm:py-4 bg-linear-to-r from-orange-600 to-red-600 text-white rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg hover:from-orange-700 hover:to-red-700 transition-all shadow-lg"
                 >
                   Analyze Another Image
                 </button>
@@ -676,7 +676,7 @@ export default function ImagePage() {
                     <button
                       onClick={handleSubmit}
                       disabled={isLoading}
-                      className="flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 md:py-5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl sm:rounded-2xl transition-all disabled:opacity-50 shadow-lg font-bold text-base sm:text-lg"
+                      className="flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 md:py-5 bg-linear-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl sm:rounded-2xl transition-all disabled:opacity-50 shadow-lg font-bold text-base sm:text-lg"
                     >
                       {isLoading ? (
                         <>
