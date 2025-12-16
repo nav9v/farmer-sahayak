@@ -87,6 +87,16 @@ const resources = {
       listenAndLearn: 'Listen and learn farming tips',
       selectTip: 'Select a farming tip to listen',
       playingTip: 'Playing tip...',
+
+      // Market Card
+      market: 'Market Prices',
+      mandiRates: 'Mandi Rates',
+      checkPrices: 'Check latest market prices',
+      
+      // Planner Card
+      planner: 'Crop Planner',
+      cropCalendar: 'Crop Calendar',
+      planSchedule: 'Plan your farming schedule',
     },
   },
   'hi-IN': {
@@ -161,6 +171,16 @@ const resources = {
       listenAndLearn: 'खेती के टिप्स सुनें और सीखें',
       selectTip: 'सुनने के लिए टिप चुनें',
       playingTip: 'टिप चल रहा है...',
+
+      // Market Card
+      market: 'बाज़ार भाव',
+      mandiRates: 'मंडी रेट',
+      checkPrices: 'नवीनतम बाज़ार भाव देखें',
+      
+      // Planner Card
+      planner: 'फसल योजना',
+      cropCalendar: 'फसल कैलेंडर',
+      planSchedule: 'अपनी खेती की योजना बनाएं',
     },
   },
   'bn-IN': {
