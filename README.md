@@ -1,4 +1,5 @@
-# Farmer Sahayak - AI Agricultural Advisor
+![OG Image](public/og.webp)
+# AI Agricultural Advisor
 
 A multilingual AI advisory system for farmers in India, built with Next.js 14+, featuring voice input, image analysis, and AI-powered agricultural guidance.
 
